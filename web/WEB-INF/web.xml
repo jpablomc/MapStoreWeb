@@ -12,10 +12,22 @@
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
+
+    <servlet>
+        <servlet-name>ajax</servlet-name>
+        <servlet-class>es.uc3m.it.mapstore.web.controller.AjaxController</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>*.html</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ajax</servlet-name>
+        <url-pattern>*.ajax</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>
             30

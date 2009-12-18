@@ -7,8 +7,6 @@ package es.uc3m.it.mapstore.web.services;
 
 import es.uc3m.it.mapstore.db.impl.MapStoreSession;
 import es.uc3m.it.mapstore.web.beans.DataType;
-import es.uc3m.it.mapstore.bean.MapStoreCondition;
-import es.uc3m.it.mapstore.bean.MapStoreItem;
 import es.uc3m.it.mapstore.exception.MapStoreRunTimeException;
 import es.uc3m.it.mapstore.web.beans.DataTypeConstant;
 import java.util.ArrayList;
@@ -23,7 +21,12 @@ import org.springframework.stereotype.Service;
 public class DataTypeService {
 
     public DataTypeService() {
+        try {
         initBasicDatatypes();
+        }catch(RuntimeException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     private void initBasicDatatypes() {

@@ -24,10 +24,14 @@ public class DataTypeConstant {
     public final static String MAPTYPE = "Map";
 
     private final static String[] basicTypes = {STRINGTYPE,INTEGERTYPE,LONGTYPE,FLOATTYPE,DOUBLETYPE,DATETYPE,LISTTYPE,ARRAYTYPE,MAPTYPE};
+    private final static String[] listTypes = {LISTTYPE,ARRAYTYPE};
+    private final static String[] mapTypes = {MAPTYPE};
 
-    public static List<String> BASICTYPES;
+    public final static List<String> BASICTYPES = Arrays.asList(basicTypes);
+    public final static List<String> LISTTYPES = Arrays.asList(listTypes);
+    public final static List<String> MAPTYPES = Arrays.asList(mapTypes);
 
-    static {
-        BASICTYPES = Arrays.asList(basicTypes);
-    }
+    public final static String LIST_PREFIX = "LIST_";
+    public final static String MAP_KEY__PREFIX = "KEY_";
+    public final static String MAP_VALUE_PREFIX = "VALUE_";
 }

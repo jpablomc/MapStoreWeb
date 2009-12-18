@@ -40,5 +40,7 @@
     <bean name="indexController"
           class="org.springframework.web.servlet.mvc.ParameterizableViewController"
           p:viewName="index" />
-    
+
+    <bean class="es.uc3m.it.mapstore.web.services.ShutdownService" destroy-method="shutdown"/>
+
 </beans>

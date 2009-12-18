@@ -26,9 +26,15 @@
                     <ul>
                         <c:forEach items="${datatypes}" var="dt">
                             <li>
-                                <a href="<c:url value="/datatype/editDatatype.html"/>?id=<c:out value="${dt.name}"/>">
+                                <a href="<c:url value="/object/objectList.html"/>?id=<c:out value="${dt.name}"/>">
                                     <c:out value="${dt.name}"/>
                                 </a>
+                                <form action="<c:url value="/datatype/editDatatype.html"/>?id=<c:out value="${dt.name}"/>">
+                                    <input type="submit" value="<fmt:message key="datatypes.list.editDatatype" bundle="${lang}"/>">
+                                </form>
+                                <form action="<c:url value="/datatype/deleteDatatype.html"/>?id=<c:out value="${dt.name}"/>">
+                                    <input type="submit" value="<fmt:message key="datatypes.list.deleteDatatype" bundle="${lang}"/>">
+                                </form>
                             </li>
                         </c:forEach>
                     </ul>
