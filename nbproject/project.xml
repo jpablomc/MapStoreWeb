@@ -6,24 +6,24 @@
             <name>MapStoreWeb</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <web-module-libraries>
-                <library>
+                <library dirs="200">
                     <file>${libs.spring-webmvc.classpath}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
-                <library>
+                <library dirs="200">
                     <file>${libs.spring-framework.classpath}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
-                <library>
+                <library dirs="200">
+                    <file>${libs.JSTL.classpath}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
                     <file>${reference.MapStore.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
-                <library>
-                    <file>${libs.Dependencies.classpath}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library>
-                    <file>${libs.JSTL.classpath}</file>
+                <library dirs="200">
+                    <file>${libs.MapStoreLib.classpath}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>

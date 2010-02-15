@@ -29,10 +29,12 @@
                                 <a href="<c:url value="/object/objectList.html"/>?id=<c:out value="${dt.name}"/>">
                                     <c:out value="${dt.name}"/>
                                 </a>
-                                <form action="<c:url value="/datatype/editDatatype.html"/>?id=<c:out value="${dt.name}"/>">
+                                <form action="<c:url value="/datatype/editDatatype.html"/>">
                                     <input type="submit" value="<fmt:message key="datatypes.list.editDatatype" bundle="${lang}"/>">
+                                    <input type="hidden" name="id" value="<c:out value="${dt.name}"/>"/>
                                 </form>
-                                <form action="<c:url value="/datatype/deleteDatatype.html"/>?id=<c:out value="${dt.name}"/>">
+                                <form action="<c:url value="/datatype/deleteDatatype.html"/>">
+                                    <input type="hidden" name="id" value="<c:out value="${dt.name}"/>"/>
                                     <input type="submit" value="<fmt:message key="datatypes.list.deleteDatatype" bundle="${lang}"/>">
                                 </form>
                             </li>

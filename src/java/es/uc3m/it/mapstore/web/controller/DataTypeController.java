@@ -63,6 +63,7 @@ public class DataTypeController {
         DataType dt = service.getDataType(req.getParameter("id"));
         mav.addObject("name", dt.getName());
         mav.addObject("properties", dt.getAttributes());
+        mav.addObject("pk", dt.getPk());
         mav.addObject("edit", true);
         return mav;
     }
@@ -82,7 +83,7 @@ public class DataTypeController {
             mav.addObject("edit", true);
             mav.addObject("error",error);
         }
-        if (mav == null) mav = new ModelAndView(new RedirectView("/datatype/list.html"));
+        if (mav == null) mav = new ModelAndView(new RedirectView("/datatype/list.html",true));
         return mav;
     }
     @RequestMapping(value= "/datatype/createDataType.html")
@@ -99,7 +100,7 @@ public class DataTypeController {
             mav.addObject("properties", dt.getAttributes());
             mav.addObject("error",error);
         }
-        if (mav == null) mav = new ModelAndView(new RedirectView("/datatype/list.html"));
+        if (mav == null) mav = new ModelAndView(new RedirectView("/datatype/list.html",true));
         return mav;
     }
 
@@ -124,6 +125,12 @@ public class DataTypeController {
         if (parameterMap.get("pk") == null) throw new IllegalArgumentException("Primary key has not been defined");
         String pk = ((String[])parameterMap.get("pk"))[0];
         String pkValue = ((String[])parameterMap.get(pk))[0];
+        String pkPropType = pk.replaceAll("propertyName", "propertyType");
+        DataType pkDT = aux.get(((String[])parameterMap.get(pkPropType))[0]);
+        if (!pkDT.getName().equals(DataTypeConstant.STRINGTYPE)) throw new IllegalArgumentException("Primary key must be a String property");
+        DataType toReturn = new DataType(name);
+        toReturn.setPk(pkValue);
+
         int indexExtra = 0;
         for (Object a : parameterMap.keySet()) {
             String propName = (String)a;
@@ -132,38 +139,34 @@ public class DataTypeController {
                 if (esNuloOVacio(nombreAtributo)) throw new IllegalArgumentException("Property name has not been definied");
                 String propType = propName.replaceAll("propertyName", "propertyType");
                 String tipoAtributo = ((String[])parameterMap.get(propType))[0];
-                DataType dt = aux.get(tipoAtributo);
-                if (dt == null) throw new IllegalArgumentException("Property "+ nombreAtributo+" has an invalid Datatype");
-                atrib.put(nombreAtributo, dt);
+                DataType dtProperty = aux.get(tipoAtributo);
+                if (dtProperty == null) throw new IllegalArgumentException("Property "+ nombreAtributo+" has an invalid Datatype");
+                atrib.put(nombreAtributo, dtProperty);
                 //Process Map and List types
-                if (DataTypeConstant.LISTTYPES.contains(dt.getName())) {
-                    String propMapKey = propName.replaceAll("propertyName", "propertyMapKeyType");
+                if (DataTypeConstant.LISTTYPES.contains(dtProperty.getName())) {
+                    String propMapKey = propName.replaceAll("propertyName", "propertyListType");
                     String key = ((String[])parameterMap.get(propMapKey))[0];
-                    dt = aux.get(key);
-                    dt.setMapKeyDataType(nombreAtributo, dt);
+                    DataType dtSubtype = aux.get(key);
+                    toReturn.setListDataType(nombreAtributo, dtSubtype);
                     indexExtra++;
-                } else if  (DataTypeConstant.MAPTYPES.contains(dt.getName())) {
+                } else if  (DataTypeConstant.MAPTYPES.contains(dtProperty.getName())) {
                     String propMapKey = propName.replaceAll("propertyName", "propertyMapKeyType");
                     String key = ((String[])parameterMap.get(propMapKey))[0];
-                    dt = aux.get(key);
-                    dt.setMapKeyDataType(nombreAtributo, dt);
+                    DataType dtSubtype = aux.get(key);
+                    toReturn.setMapKeyDataType(nombreAtributo, dtSubtype);
                     indexExtra++;
                     String propMapValue = propName.replaceAll("propertyName", "propertyMapValueType");
                     String value = ((String[])parameterMap.get(propMapValue))[0];
-                    dt = aux.get(value);
-                    dt.setMapValueDataType(nombreAtributo, dt);
+                    dtSubtype = aux.get(value);
+                    toReturn.setMapValueDataType(nombreAtributo, dtSubtype);
                     indexExtra++;
                 }
 
             }
         }
         if (atrib.size()*2+indexExtra+2 != parameterMap.size()) throw new IllegalArgumentException("Not all the parameters can be processed");
-        DataType pkDT = atrib.get(pkValue);
-        if (!pkDT.getName().equals(DataTypeConstant.STRINGTYPE)) throw new IllegalArgumentException("Primary key must be a String property");
-        DataType dt = new DataType(name);
-        dt.setPk(pkValue);
-        dt.setAttributes(atrib);
-        return dt;
+        toReturn.setAttributes(atrib);
+        return toReturn;
     }
 
     private DataType validateFormWithErrors(Map parameterMap){
@@ -174,42 +177,57 @@ public class DataTypeController {
         }
         String name = ((String[])parameterMap.get("name"))[0];
         Map<String,DataType> atrib = new HashMap<String, DataType>();
-        String pkValue = null;
-        if (parameterMap.get("pk") != null) {
-            String pk = ((String[])parameterMap.get("pk"))[0];
-            pkValue = ((String[])parameterMap.get(pk))[0];
-        }
+        if (parameterMap.get("pk") == null) throw new IllegalArgumentException("Primary key has not been defined");
+        String pk = ((String[])parameterMap.get("pk"))[0];
+        String pkValue = ((String[])parameterMap.get(pk))[0];
+        String pkPropType = pk.replaceAll("propertyName", "propertyType");
+        DataType pkDT = atrib.get(pkPropType);
+        if (!pkDT.getName().equals(DataTypeConstant.STRINGTYPE)) throw new IllegalArgumentException("Primary key must be a String property");
+        DataType toReturn = new DataType(name);
+        toReturn.setPk(pkValue);
+        int indexExtra = 0;
         for (Object a : parameterMap.keySet()) {
             String propName = (String)a;
             if (propName.startsWith("propertyName")) {
                 String nombreAtributo = ((String[])parameterMap.get(a))[0];
                 String propType = propName.replaceAll("propertyName", "propertyType");
                 String tipoAtributo = ((String[])parameterMap.get(propType))[0];
-                DataType dt = aux.get(tipoAtributo);
-                atrib.put(nombreAtributo, dt);
+                DataType dtProperty = aux.get(tipoAtributo);
+                atrib.put(nombreAtributo, dtProperty);
                 //Process Map and List types
-                if (DataTypeConstant.LISTTYPES.contains(dt.getName())) {
+                if (DataTypeConstant.LISTTYPES.contains(dtProperty.getName())) {
+                    String propMapKey = propName.replaceAll("propertyName", "propertyListType");
+                    String key = ((String[])parameterMap.get(propMapKey))[0];
+                    DataType dtSubtype = aux.get(key);
+                    toReturn.setMapKeyDataType(nombreAtributo, dtSubtype);
+                    indexExtra++;
+                } else if  (DataTypeConstant.MAPTYPES.contains(dtProperty.getName())) {
                     String propMapKey = propName.replaceAll("propertyName", "propertyMapKeyType");
                     String key = ((String[])parameterMap.get(propMapKey))[0];
-                    dt = aux.get(key);
-                    dt.setMapKeyDataType(nombreAtributo, dt);
-                } else if  (DataTypeConstant.MAPTYPES.contains(dt.getName())) {
-                    String propMapKey = propName.replaceAll("propertyName", "propertyMapKeyType");
-                    String key = ((String[])parameterMap.get(propMapKey))[0];
-                    dt = aux.get(key);
-                    dt.setMapKeyDataType(nombreAtributo, dt);
+                    DataType dtSubtype = aux.get(key);
+                    toReturn.setMapKeyDataType(nombreAtributo, dtSubtype);
+                    indexExtra++;
                     String propMapValue = propName.replaceAll("propertyName", "propertyMapValueType");
                     String value = ((String[])parameterMap.get(propMapValue))[0];
-                    dt = aux.get(value);
-                    dt.setMapValueDataType(nombreAtributo, dt);
+                    dtSubtype = aux.get(value);
+                    toReturn.setMapValueDataType(nombreAtributo, dtSubtype);
+                    indexExtra++;
                 }
             }
         }
-        DataType dt = new DataType(name);
-        dt.setPk(pkValue);
-        dt.setAttributes(atrib);
-        return dt;
+        if (atrib.size()*2+indexExtra+2 != parameterMap.size()) throw new IllegalArgumentException("Not all the parameters can be processed");
+        toReturn.setAttributes(atrib);
+        return toReturn;
     }
+
+
+    @RequestMapping(value= "/datatype/deleteDatatype.html")
+    public ModelAndView deleteDatatype(HttpServletRequest req) {
+        DataType dt = service.getDataType(req.getParameter("id"));
+        service.deleteDataType(dt);
+        return new ModelAndView(new RedirectView("/datatype/list.html",true));
+    }
+
 
 
     private boolean esNuloOVacio(String s) {

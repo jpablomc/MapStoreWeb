@@ -68,6 +68,7 @@
                                 <th><fmt:message key="id" bundle="${lang}"/></th>
                                 <th><fmt:message key="version" bundle="${lang}"/></th>                                
                                 <th><fmt:message key="recordDate" bundle="${lang}"/>(<c:out value="${datePattern}"/>)</th>
+                                <th><fmt:message key="type" bundle="${lang}"/></th>
                                 <th><fmt:message key="name" bundle="${lang}"/></th>
                             </tr>
                         </thead>
@@ -84,9 +85,10 @@
                                             <td><c:out value="${item.id}"/></td>
                                             <td><c:out value="${item.version}"/></td>
                                             <td><fmt:formatDate value="${item.recordDate}" pattern="${datePattern}"/></td>
+                                            <td><c:out value="${item.type}"/></td>
                                             <td>
-                                                <a href="<<c:url value="/object/showObject.html"/>?id=<c:out value="${item.id}"/>&version=<c:out value="${item.version}"/>"/>"/>
-                                                <c:out value="${item.value.name}"/>
+                                                <a href="<c:url value="/object/showObject.html"/>?id=${item.id}&version=${item.version}">
+                                                    <c:out value="${item.name}"/>
                                                 </a>
                                             </td>
                                         </tr>
@@ -97,7 +99,7 @@
                     </table>
                 </c:otherwise>
             </c:choose>
-            <form >
+                    <form action="<c:url value="/object/newDataObject.html"/>">
                 <input type="submit" value="<fmt:message key="object.search.newObject" bundle="${lang}"/>">
             </form>
         </div>

@@ -5,8 +5,12 @@
 
 package es.uc3m.it.mapstore.web.controller;
 
+import es.uc3m.it.mapstore.exception.MapStoreRunTimeException;
 import es.uc3m.it.mapstore.web.beans.DataType;
 import es.uc3m.it.mapstore.web.beans.DataTypeConstant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -15,17 +19,13 @@ import es.uc3m.it.mapstore.web.beans.DataTypeConstant;
 public class DataObjectControllerHelper {
     public static String createFormForNewObject(DataType dt) {
         StringBuffer sb = new StringBuffer();
-        for (String atributo : dt.getAttributes().keySet()) {
-            sb.append(createLabelForProperty(atributo));
+        sb.append("<properties>");
+        List<String> aux = new ArrayList(dt.getAttributes().keySet());
+        Collections.sort(aux);
+        for (String atributo : aux) {
             sb.append(createInputForProperty(atributo,dt));
-            sb.append("<br/>");
         }
-        return sb.toString();
-    }
-
-    private static String createLabelForProperty(String property) {
-        StringBuffer sb = new StringBuffer("<label for=\"").append(property)
-                .append("\">").append(property).append(": </label>");
+        sb.append("</properties>");
         return sb.toString();
     }
 
@@ -53,21 +53,23 @@ public class DataObjectControllerHelper {
     }
 
     private static String createInputForList(String property, DataType aux2) {
-        String name = aux2.getName();
+        String name = "";
+        if (aux2 != null) name = aux2.getName();
         StringBuffer sb = new StringBuffer();
-        sb.append("<table id=").append(property).append("><thead><tr><th></th><th></th></tr></thead><<tbody></tbody>/table");
         if (DataTypeConstant.BASICTYPES.contains(name)) {
             if(DataTypeConstant.STRINGTYPE.equals(name)) {
-                sb.append("<input type=\"button\" onclicK=\"listAddString("+property+")\" value=\"Add\" />");
+                sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\""+DataTypeConstant.STRINGTYPE+"\" />");
             } else if(DataTypeConstant.DATETYPE.equals(name)) {
-                sb.append("<input type=\"button\" onclicK=\"listAddDate("+property+")\" value=\"Add\" />");
+                sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\""+DataTypeConstant.DATETYPE+"\" />");
             } else if (DataTypeConstant.FLOATTYPE.equals(name) ||DataTypeConstant.DOUBLETYPE.equals(name)) {
-                sb.append("<input type=\"button\" onclicK=\"listAddDecimal("+property+")\" value=\"Add\" />");
+                sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\"DECIMAL\" />");
+            } else if (DataTypeConstant.INTEGERTYPE.equals(name) ||DataTypeConstant.LONGTYPE.equals(name)) {
+                sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\"INTEGER\" />");
             } else {
-                sb.append("<input type=\"button\" onclicK=\"listAddInteger("+property+")\" value=\"Add\" />");
+                throw new MapStoreRunTimeException("IMPOSIBLE");
             }
         } else{
-                sb.append("<input type=\"button\" onclicK=\"listAddObject("+property+","+name+")\" value=\"Add\" />");
+                sb.append("<property name=\""+property+"\"  type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\""+name+"\" />");
         }
         return sb.toString();
     }
@@ -76,52 +78,46 @@ public class DataObjectControllerHelper {
         String keyStr = key.getName();
         String valueStr = value.getName();
         StringBuffer sb = new StringBuffer();
-        sb.append("<table id=").append(property).append("><thead><tr><th></th><th></th><th></th></tr></thead><<tbody></tbody>/table");
-        sb.append("<input type=\"button\" onclicK=\"mapAddObject("+property+","+keyStr+","+valueStr+")\" value=\"Add\" />");
+        String mapKey;
+        String mapValue;
+        mapKey = (key != null)?key.getName():"";
+        mapValue = (value != null)?value.getName():"";
+        sb.append("<property name=\""+property+"\" type=\"")
+                .append(DataTypeConstant.MAPTYPE).append("\" mapKeyType=\"").append(mapKey)
+                .append("\" mapValueType=\"").append(mapValue).append("\"/>");
         return sb.toString();
     }
 
     private static String createInputForDate(String property) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<input type=\"text\" id=\"").append(property).
-                append("\" name=\"").append(property).
-                append("\" onblur=\"checkDate(").append(property).append("\"/>");
+        sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.DATETYPE+"\"/>");
         return sb.toString();
     }
 
     private static String createInputForString(String property, String pk) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<input type=\"text\" id=\"").append(property).
-                append("\" name=\"").append(property).append("\" ");
-        if (property.equals(pk)) sb.append("readonly=\"readonly\" ");
-        sb.append("/>");
+        sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.STRINGTYPE+"\"");
+        if (property.equals(pk)) sb.append(" isName=\"true\"");
+        sb.append(" />");
         return sb.toString();
     }
 
     private static String createInputForInteger(String property) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<input type=\"text\" id=\"").append(property).
-                append("\" name=\"").append(property).
-                append("\" onblur=\"checkInteger(").append(property).append("\"/>");
+        sb.append("<property name=\""+property+"\" type=\"INTEGER\"/>");
         return sb.toString();
     }
 
     private static String createInputForDecimal(String property) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<input type=\"text\" id=\"").append(property).
-                append("\" name=\"").append(property).
-                append("\" onblur=\"checkDecimal(").append(property).append("\"/>");
+        sb.append("<property name=\""+property+"\" type=\"DECIMAL\"/>");
         return sb.toString();
     }
 
     private static String createInputForObject(String property, DataType aux) {
         String name = aux.getName();
         StringBuffer sb = new StringBuffer();
-        sb.append("<input type=\"text\" id=\"").append(property).
-                append("\" name=\"").append(property).append("\"").
-                append("readOnly=\"readonly\"/>");
-        sb.append("<input type=\"button\" onclicK=\"inputAddObject("+property+","+name+")\" value=\"Add\" />");
-        sb.append("<input type=\"button\" onclicK=\"inputClearObject("+property+")\" value=\"Remove\" />");
+        sb.append("<property name=\""+property+"\" type=\""+aux.getName()+"\"/>");
         return sb.toString();
     }
 

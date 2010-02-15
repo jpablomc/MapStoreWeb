@@ -5,6 +5,7 @@
 
 package es.uc3m.it.mapstore.web.beans;
 import es.uc3m.it.mapstore.bean.annotations.Name;
+import es.uc3m.it.mapstore.bean.annotations.Type;
 import java.util.Map;
 import java.util.TreeMap;
 /**
@@ -13,20 +14,29 @@ import java.util.TreeMap;
  *
  * @author Pablo
  */
-public class DataType {    
+public class DataType {
+
+    public final static String TYPE_NAME = "DataType";
+
     @Name(order=0)
     private String name;
+    @Type
+    private String type;
     private Map<String,DataType> attributes;
     private Map<String,DataType> extraData;
     private String pk;
 
     public DataType() {
         attributes = new TreeMap<String, DataType>();
+        extraData = new TreeMap<String, DataType>();
+        type = TYPE_NAME;
     }
 
     public DataType(String name) {
         this.name = name;
+        type = TYPE_NAME;
         attributes = new TreeMap<String, DataType>();
+        extraData = new TreeMap<String, DataType>();
     }
 
     public void setName(String name) {
@@ -35,6 +45,10 @@ public class DataType {
 
     public String getName() {
         return name;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public Map<String, DataType> getAttributes() {

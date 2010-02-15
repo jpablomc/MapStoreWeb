@@ -5,6 +5,7 @@
 
 package es.uc3m.it.mapstore.web.beans;
 
+import es.uc3m.it.mapstore.bean.MapStoreItem;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,11 +27,19 @@ public class DataObject implements Map<String,Object>{
     
     private Map<String,Object> delegate;
 
-    public DataObject(DataType dt) {
+    public DataObject(String name, DataType dt) {
         delegate = new TreeMap<String,Object>();
         delegate.put(DATATYPE, dt);
+        delegate.put(MapStoreItem.TYPE, dt.getName());
+        delegate.put(MapStoreItem.NAME, name);
     }
 
+
+    /**
+     *
+     * Default constructor. Only use for reflection
+     *
+     */
     public DataObject() {
         delegate = new TreeMap<String,Object>();
     }

@@ -5,12 +5,15 @@
 
 package es.uc3m.it.mapstore.web.services;
 
+import es.uc3m.it.mapstore.bean.MapStoreItem;
 import es.uc3m.it.mapstore.db.impl.MapStoreSession;
 import es.uc3m.it.mapstore.web.beans.DataType;
 import es.uc3m.it.mapstore.exception.MapStoreRunTimeException;
 import es.uc3m.it.mapstore.web.beans.DataTypeConstant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,6 +53,8 @@ public class DataTypeService {
         } catch (MapStoreRunTimeException ex) {
             s.rollback();
             throw ex;
+        } finally{
+            s.close();
         }
     }
 
@@ -61,8 +66,11 @@ public class DataTypeService {
             s.save(dt);
             s.commit();
         } catch (MapStoreRunTimeException ex) {
+            Logger.getLogger(DataTypeService.class.getName()).log(Level.SEVERE, ex.getMessage(),ex);
             s.rollback();
             throw ex;
+        } finally {
+            s.close();
         }
     }
 
@@ -75,29 +83,46 @@ public class DataTypeService {
         } catch (MapStoreRunTimeException ex) {
             s.rollback();
             throw ex;
+        } finally {
+            s.close();
         }
     }
 
     public void deleteDataType(DataType dt){
         MapStoreSession s = MapStoreSession.getSession();
-        s.beginTransaction();
-        s.delete(dt);
-        try {
-            s.commit();
-        } catch (MapStoreRunTimeException ex) {
-            s.rollback();
-            throw ex;
+        if (canBeDeleted(dt)) {
+            s.beginTransaction();
+            try {
+                s.delete(dt);
+                s.commit();
+            } catch (MapStoreRunTimeException ex) {
+                s.rollback();
+                throw ex;
+            } finally {
+                s.close();
+            }
         }
     }
 
     public List<DataType> getAll() {
         MapStoreSession s = MapStoreSession.getSession();
-        return s.findByType(DataType.class);
+        return s.findByType(DataType.class,DataType.TYPE_NAME);
     }
 
     public DataType getDataType(String nombre) {
         MapStoreSession s = MapStoreSession.getSession();
-        return s.findByNameType(nombre, DataType.class);
+        return s.findByNameType(nombre, DataType.TYPE_NAME, DataType.class);
+    }
+
+    private boolean canBeDeleted(DataType dt) {
+        boolean result = true;
+        if (DataTypeConstant.BASICTYPES.contains(dt.getName())) result = false;
+        else {
+            MapStoreSession s = MapStoreSession.getSession();
+            List<MapStoreItem> items = s.findByType(dt.getName());
+            if (!items.isEmpty()) result = false;
+        }
+        return result;
     }
 
 

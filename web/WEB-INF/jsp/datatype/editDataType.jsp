@@ -174,7 +174,7 @@
                                     <tr id="property<c:out value='${status.count}'/>">
                                         <td>
                                             <c:choose>
-                                                <c:when test="${dt.pk eq prop.key}"><input type="radio" name="pk" value="propertyName<c:out value='${status.count}'/>" checked="checked"/></c:when>
+                                                <c:when test="${pk eq prop.key}"><input type="radio" name="pk" value="propertyName<c:out value='${status.count}'/>" checked="checked"/></c:when>
                                                 <c:otherwise><input type="radio" name="pk" value="propertyName<c:out value='${status.count}'/>"/></c:otherwise>
                                             </c:choose>                                            
                                         </td>
