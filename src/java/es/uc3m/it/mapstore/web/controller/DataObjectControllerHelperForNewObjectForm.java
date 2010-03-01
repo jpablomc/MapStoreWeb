@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Pablo
  */
-public class DataObjectControllerHelper {
+public class DataObjectControllerHelperForNewObjectForm {
     public static String createFormForNewObject(DataType dt) {
         StringBuffer sb = new StringBuffer();
         sb.append("<properties>");
@@ -65,6 +65,8 @@ public class DataObjectControllerHelper {
                 sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\"DECIMAL\" />");
             } else if (DataTypeConstant.INTEGERTYPE.equals(name) ||DataTypeConstant.LONGTYPE.equals(name)) {
                 sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\"INTEGER\" />");
+            } else if (DataTypeConstant.FILETYPE.equals(name)) {
+                sb.append("<property name=\""+property+"\" type=\""+DataTypeConstant.LISTTYPE+"\" subtype=\""+DataTypeConstant.FILETYPE+"\" />");
             } else {
                 throw new MapStoreRunTimeException("IMPOSIBLE");
             }
@@ -75,8 +77,8 @@ public class DataObjectControllerHelper {
     }
 
     private static String createInputForMap(String property, DataType key, DataType value) {
-        String keyStr = key.getName();
-        String valueStr = value.getName();
+        String keyStr = (key != null)?key.getName():"";
+        String valueStr = (value != null)?value.getName():"";
         StringBuffer sb = new StringBuffer();
         String mapKey;
         String mapValue;

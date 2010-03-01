@@ -43,4 +43,8 @@
 
     <bean class="es.uc3m.it.mapstore.web.services.ShutdownService" destroy-method="shutdown"/>
 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="104857600"/>
+    </bean>
+
 </beans>

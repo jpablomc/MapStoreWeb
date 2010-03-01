@@ -5,17 +5,28 @@
 
 var locale;
 var contextPath;
-var errorOnInteger = "Property #PROPERTY# must be an integer";
-var errorOnDecimal = "Property #PROPERTY# must be a decimal";
-var errorOnDate = "Property #PROPERTY# must be a date";
-var promptListString = "Introduce the string to add";
-var promptListDecimal = "Introduce the decimal number to add";
-var promptListInteger = "Introduce the integer number to add";
-var promptListDate = "Introduce the date to add";
-var errorListDecimal = "Value must be a decimal number";
-var errorListInteger = "Value must be a integer number";
-var errorListDate = "Value must be a date number";
-var deleteRowList = "Delete";
+var errorOnInteger;
+var errorOnDecimal;
+var errorOnDate;
+var promptListString;
+var promptListDecimal;
+var promptListInteger;
+var promptListDate;
+var errorListDecimal;
+var errorListInteger;
+var errorListDate;
+var deleteRowList;
+var errorMapKeyUndefined;
+var errorMapKeyNotInteger;
+var errorMapKeyNotDecimal;
+var errorMapKeyNotDate;
+var errorMapValueNotInteger;
+var errorMapValueNotDecimal;
+var errorMapValueNotDate;
+var upRowList;
+var downRowList;
+var selecObjectInternationalizedString;
+
 var objectPropertyName = new Array();
 var objectPropertyType = new Array();
 var listPropertyName = new Array();
@@ -36,9 +47,12 @@ $(function(){
 //            }
 //        }
 //    })
-    $('#form').submit(function(e) {
+    $('#form').submit(function() {
         var valid = validateForm();
-        if (!valid) e.preventDefault();
+        if (valid) {
+            return true;
+        }
+        return false;
     })
 
     //METODOS PARA ASOCIAR UN OBJETO
@@ -87,10 +101,12 @@ $(function(){
             //No hay validacion
             //Introducir en la tabla
             var property = $(this).parent().find("table").attr('id');
-            var tbody = $(this).parent().find("tbody"); //tenemos el cuerpo de la tabla
-            tbody.append('<tr><td><input type="text" value='+result+
-                ' name="'+property+'" reodonly="true"/></td><td><input type="button" value="'+ deleteRowList +
-                '" class="deleteRow"/></td></tr>')
+            var tbody = $(this).parent().find("tbody"); //tenemos el cuerpo de la tabla            
+            tbody.append('<tr><td><input type="hidden" value='+result+
+                ' name="'+property+'"/><span>'+result+'</span></td><td><input type="button" value="'+ upRowList +
+                '" class="upRow"/><input type="button" value="'+ deleteRowList +
+                '" class="deleteRow"/><input type="button" value="'+ downRowList +
+                '" class="downRow"/></td></tr>')
         }
     })
 
@@ -102,9 +118,11 @@ $(function(){
                 //Introducir en la tabla
                 var property = $(this).parent().find("table").attr('id');
                 var tbody = $(this).parent().find("tbody"); //tenemos el cuerpo de la tabla
-                tbody.append('<tr><td><input type="text" value='+result+
-                    ' name="'+property+'" reodonly="true"/></td><td><input type="button" value="'+ deleteRowList +
-                    '" class="deleteRow"/></td></tr>')
+                tbody.append('<tr><td><input type="hidden" value='+result+
+                    ' name="'+property+'"/><span>'+result+'</span></td><td><input type="button" value="'+ upRowList +
+                    '" class="upRow"/><input type="button" value="'+ deleteRowList +
+                    '" class="deleteRow"/><input type="button" value="'+ downRowList +
+                    '" class="downRow"/></td></tr>')
             } else alert (errorListDecimal);
         }
     })
@@ -116,11 +134,13 @@ $(function(){
             if (validateInteger(result)) {
                 //Introducir en la tabla
                 var property = $(this).parent().find("table").attr('id');
-                var tbody = $(this).parent().find("tbody"); //tenemos el cuerpo de la tabla
-                tbody.append('<tr><td><input type="text" value='+result+
-                    ' name="'+property+'" reodonly="true"/></td><td><input type="button" value="'+ deleteRowList +
-                    '" class="deleteRow"/></td></tr>')
-            } else alert (errorListDecimal);
+                    var tbody = $(this).parent().find("tbody"); //tenemos el cuerpo de la tabla
+                    tbody.append('<tr><td><input type="hidden" value='+result+
+                    ' name="'+property+'"/><span>'+result+'</span></td><td><input type="button" value="'+ upRowList +
+                    '" class="upRow"/><input type="button" value="'+ deleteRowList +
+                    '" class="deleteRow"/><input type="button" value="'+ downRowList +
+                    '" class="downRow"/></td></tr>')
+        } else alert (errorListDecimal);
         }
     })
 
@@ -132,17 +152,37 @@ $(function(){
                 //Introducir en la tabla
                 var property = $(this).parent().find("table").attr('id');
                 var tbody = $(this).parent().find("tbody"); //tenemos el cuerpo de la tabla
-                tbody.append('<tr><td><input type="text" value='+result+
-                    ' name="'+property+'" reodonly="true"/></td><td><input type="button" value="'+ deleteRowList +
-                    '" class="deleteRow"/></td></tr>')
+                tbody.append('<tr><td><input type="hidden" value='+result+
+                    ' name="'+property+'"/><span>'+result+'</span></td><td><input type="button" value="'+ upRowList +
+                    '" class="upRow"/><input type="button" value="'+ deleteRowList +
+                    '" class="deleteRow"/><input type="button" value="'+ downRowList +
+                    '" class="downRow"/></td></tr>')
             } else alert (errorListDecimal);
         }
+    })
+
+    $('.upRow').live('click',function() {
+        var $thisRow = $(this).parents('tr:first');
+        $thisRow.insertBefore( $thisRow.prev() );
+    })
+
+    $('.downRow').live('click',function() {
+        var $thisRow = $(this).parents('tr:first');
+        $thisRow.insertAfter( $thisRow.next() );
     })
 
     $('.deleteRow').live('click',function() {
         var tr = $(this).parent().parent();
         tr.remove();
     })
+
+    //Metodos para la lista de ficheros
+    $('.addToListFile').live('click',function() {
+        //determinar tipo de la lista
+        var property = $(this).parent().find("table").attr('id');
+        showPopUpForFileList(property);
+    })
+
 
     //Metodos para la lista de objetos
     $('.addToListObject').live('click',function() {
@@ -167,9 +207,11 @@ $(function(){
                 var value = $(this).attr('value');
                 var data = value.split("|", 3);
                 tbody.append('<tr><td><input type="hidden" value="'+ data[0] +
-                    '" name="'+popUpForObjectListProperty+'"/><input type="text" value="'
-                    +data[1]+': ' + data[2] + '"  reodonly="true"/></td><td><input type="button" value="'
-                    + deleteRowList + '" class="deleteRow"/></td></tr>')
+                    '" name="'+popUpForObjectListProperty+'"/><span>'
+                    +data[1]+': ' + data[2] + '</span></td><td><input type="button" value="'+ upRowList +
+                    '" class="upRow"/><input type="button" value="'+ deleteRowList +
+                    '" class="deleteRow"/><input type="button" value="'+ downRowList +
+                    '" class="downRow"/></td></tr>')
             }
         })
         resolvePopUpForObjectList();
@@ -179,22 +221,175 @@ $(function(){
         resolvePopUpForObjectList();
     })
 
-    //Metodos para el mapa
     $('.addToMap').live('click',function() {
-        //determinar tipo de la lista
+        var tbody = $(this).parent().find("tbody");
+        var count = tbody.find("tr").length;
         var property = $(this).parent().find("table").attr('id');
         var typeKey;
         var typeValue;
         var i;
         for (i=0;i<mapPropertyName.length;i++) {
-            if (listPropertyName[i] == property) {
+            if (mapPropertyName[i] == property) {
                 typeKey = mapPropertyKeyType[i];
                 typeValue = mapPropertyValueType[i];
             }
         }
-        showPopUpForMap(typeKey,typeValue,property);
+        if (typeKey == "File") {
+            text = '<tr><td><input type="file" name="' + property + '_key_' +count+ '"/></td>';
+        } else if (typeKey == "String") {
+            text = '<tr><td><input type="text" name="' + property + '_key_' +count+ '" class="stringInput"/></td>';
+        } else if (typeKey == "Date") {
+            text = '<tr><td><input type="text" name="' + property + '_key_' +count+ '" class="dateInput"/></td>';
+        } else if (typeKey == "Integer" || typeKey == "Long") {
+            text = '<tr><td><input type="text" name="' + property + '_key_' +count+ '" class="integerInput"/></td>';
+        } else if (typeKey == "Double" || typeKey == "Float") {
+            text = '<tr><td><input type="text" name="' + property + '_key_' +count+ '" class="decimalInput"/></td>';
+        } else {
+            text = '<tr><td><input type="hidden" name="' + property + '_key_' +count+ '"/>'+
+                '<input type="text" disabled="disabled"/>'+
+                '<input type="button" value="'+addToListInternationalizedString+'" class="searchForMapObject/></td>'
+        }
+
+        if (typeValue == "File") {
+            text += '<td><input type="file" name="' + property + '_value_' +count+ '"/></td>';
+        } else if (typeValue == "String") {
+            text += '<td><input type="text" name="' + property + '_value_' +count+ '" class="stringInput"/></td>';
+        } else if (typeValue == "Date") {
+            text += '<td><input type="text" name="' + property + '_value_' +count+ '" class="dateInput"/></td>';
+        } else if (typeValue == "Integer" || typeValue == "Long") {
+            text += '<td><input type="text" name="' + property + '_value_' +count+ '" class="integerInput"/></td>';
+        } else if (typeValue == "Double" || typeValue == "Float") {
+            text += '<td><input type="text" name="' + property + '_value_' +count+ '" class="decimalInput"/></td>';
+        } else {
+            text += '<td><input type="hidden" name="' + property + '_value_' +count+ '"/>'+
+                '<input type="text" disabled="disabled"/>'+
+                '<input type="button" value="'+addToListInternationalizedString+'" class="searchForMapObject"/></td>'
+        }
+        text += '<td><input type="button" value="'+ deleteRowList + '" class="deleteRowMap"/></td></tr>';
+        $(tbody).append(text);
+
     });
 
+    $('.searchForMapObject').live('click',function() {
+        var table = $(this).parents("table:first");
+        var td = $(this).parent();
+        //Determine if it is key or value
+        var col = $(td).parent().children().index($(this));
+        var array;
+        if (col == 1) array = mapPropertyKeyType;
+        else array = mapPropertyValueType;
+        var property = $(table).attr("id");
+        var type;
+        var i;
+
+        for (i=0;i<mapPropertyName.length;i++) {
+            if (mapPropertyName[i] == property) {
+                type = array[i];
+            }
+        }
+        showPopUpForMap(type, td);
+    });
+
+    $('.searchMap').live('click',function() {
+        var div = $(this).parent();
+        var type = $(div).find('input[name="type"]').attr("value");
+        var query = $(div).find('input[name="query"]').attr("value");
+        var URL =  contextPath + "/object/popupMapSearch.html?type="+type + "&query=" + escape(query);
+
+        $("#cssPopup").load(URL,function(){
+		//$("#cssPopupContainer").center(); //Si activamos esta línea y desactivamos la de abajo nos centrará el PopUp en el medio de la pantalla.
+		$("#cssPopupContainer").css("top",50);
+		ancho=$(window).width();
+		$("#cssPopupContainer").slideDown("fast", function () {
+			anchopopup=$("#cssPopup").width();
+			$("#cssPopupContainer").css("width",ancho);
+		});
+	});
+    });
+
+    //Metodos para el mapa
+//    $('.popupMapAccept').live('click',function() {
+//        var keyValue ="";
+//        var valueValue ="";
+//        var classKey;
+//        var classValue;
+//
+//        //Validar
+//        var divKey = $("#divMapPopUpKey").find("div");
+//        if (divKey.attr("class") == "basic") {
+//            classKey = "BASIC";
+//            var input = divKey.find("input");
+//            keyValue = input.attr("value");
+//            var clazz = input.attr("class");
+//            if (clazz == "basicString") {
+//            } else if (clazz == "basicInteger" && !validateInteger(keyValue)) {
+//                alert(errorMapKeyNotInteger);
+//                return;
+//            } else if (clazz == "basicDecimal" && !validateDecimal(keyValue)) {
+//                alert(errorMapKeyNotDecimal);
+//                return;
+//            } else if (clazz == "basicDate" && !validateDate(keyValue)) {
+//                alert(errorMapKeyNotDate);
+//                return;
+//            }
+//        } else if (divKey.attr("class") == "file") {
+//            input = divKey.find("input");
+//            keyValue = input;
+//            classKey = "FILE";
+//        } else {
+//            classKey = "COMPLEX";
+//            var tbody = divKey.find("tbody");
+//            tbody.find("input[name='selected_key']").each( function() {
+//                var selected = $(this).attr('checked');
+//                if (selected) {
+//                    keyValue= $(this).attr('value');
+//                }
+//            })
+//        }
+//        //Validar
+//        var divValue = $("#divMapPopUpValue").find("div");
+//        if (divValue.attr("class") == "basic") {
+//            classValue = "BASIC";
+//            input = divValue.find("input");
+//            valueValue = input.attr("value");
+//            clazz = input.attr("class");
+//            if (clazz == "basicString") {
+//            } else if (clazz == "basicInteger" && !validateInteger(valueValue)) {
+//                    alert(errorMapValueNotInteger);
+//                    return;
+//            } else if (clazz == "basicDecimal" && !validateDecimal(valueValue)) {
+//                    alert(errorMapValueNotDecimal);
+//                    return;
+//            } else if (clazz == "basicDate" && !validateDate(valueValue)) {
+//                    alert(errorMapValueNotDate);
+//                    return;
+//            }
+//        } else if (divValue.attr("class") == "file") {
+//            classValue = "FILE";
+//            input = divValue.find("input");
+//            valueValue = input.attr("value");
+//        } else {
+//            classValue = "COMPLEX";
+//            tbody = divValue.find("tbody");
+//            tbody.find("input[name='selected_value']").each( function() {
+//                var selected = $(this).attr('checked');
+//                if (selected) {
+//                    valueValue= $(this).attr('value');
+//                }
+//            })
+//        }
+//        addRowToMap(keyValue, classKey, valueValue, classValue);
+//        resolvePopUpForMap();
+//    })
+//
+//
+//    $('.popupMapCancel').live('click',function() {
+//        resolvePopUpForMap();
+//    })
+//
+//    $('.deleteRowMap').live('click',function() {
+//        deleteRowMap($(this));
+//    })
 });
 
 function validateForm() {
@@ -206,13 +401,13 @@ function validateForm() {
                 var aux;
                 var valid = true;
                 if (clazz == 'integerInput') {
-                    valid = validateInteger(this.attr('value'));
+                    valid = validateInteger($(this).attr('value'));
                     aux = errorOnInteger;
                 } else if (clazz == 'decimalInput') {
-                    valid = validateDecimal(this.attr(value));
+                    valid = validateDecimal($(this).attr('value'));
                     aux = errorOnDecimal;
                 } else if (clazz == 'dateInput') {
-                    valid = validateDate(this);
+                    valid = validateDate($(this).attr('value'));
                     aux = errorOnDate;
                 }
                 if (!valid) {
@@ -227,7 +422,7 @@ function validateForm() {
 }
 
 function validateInteger(value) {
-    var integerStr = /\d+/i;
+    var integerStr = /-?\d+/i;
     if (value.length > 0) {
         var result = integerStr.exec(value);
         if (result == null || result.length != 1 || result[0].length != value.length) return false;
@@ -238,7 +433,7 @@ function validateInteger(value) {
 function validateDecimal(value) {
     if (value.length > 0) {
         if (!validateInteger(value)) {
-            var decimalStr = /\d+\.\d+/i;
+            var decimalStr = /-?\d+\.\d+/i;
             var result = decimalStr.exec(value);
             if (result == null || result.length != 1 || result[0].length != value.length) return false;
         }
@@ -246,8 +441,7 @@ function validateDecimal(value) {
     return true;
 }
 
-function validateDate(input) {
-    var value = input.value;
+function validateDate(value) {
     if (value.length > 0) {
         var dateStr;
         if (value.length == 10) dateStr = /\d{2}\/\d{2}\/\d{4}/i;
@@ -339,17 +533,90 @@ function resolvePopUpForObjectList() {
 }
 
 //Funciones pop up lista objetos
-var popUpForObjectListProperty;
-
-function showPopUpForMap(typeKey,typeValue,property) {
-    var url = contextPath + "object/popupObjectMap.html?type="+type;
-    popUpForObjectListProperty = property;
+var popUpForMapInput;
+function showPopUpForMap(type,td) {
+    var url = contextPath + "/object/popupMapSearch.html?type="+type;
+    popUpForMapInput = td;
     popupCssShow(url, 460);
 
 }
 
 function resolvePopUpForMap() {
+    popUpForMapInput = null;
+    popupCssHide();
+}
 
+function addRowToMap(keyValue, classKey, valueValue, classValue) {
+
+
+    var tbody = $("#"+popUpForMapProperty).find("tbody");
+    $(tbody).append("<tr>/tr>");
+//
+//
+//    if (keyValue == "") classKey = "BASIC";
+//    if (valueValue == "") classValue = "BASIC";
+//    var key;
+//    var value;
+//    if (classKey == "COMPLEX") {
+//        var data = keyValue.split("|", 3);
+//        key = data[0];
+//        value = data[1] +":" + data[2];
+//    } else {
+//        key = keyValue;
+//        value = keyValue;
+//    }
+//    //Eliminamos la posible clave duplicada
+//    tbody.find("input[name^="+popUpForMapProperty+"_key_]").each(function(){
+//        if ($(this).attr("value") == key) {
+//            deleteRowMap($(this));
+//        }
+//    })
+//
+//
+//    var count = tbody.find("input[name^="+popUpForMapProperty+"_key_]").length;
+//
+//    //Generamos el contenido de la celda de la clave
+//    if (classKey == "COMPLEX" || classKey == "BASIC") {
+//        var keyCell = '<input type="hidden" name="'+popUpForMapProperty+'_key_'
+//        +count+ '" value="'+key+'"/>'+ value;
+//    } else {
+//        keyCell = '<input type="file" name="'+popUpForMapProperty+'_key_'
+//        +count+ '" value="'+key+'"/>'
+//    }
+//    var text = '<tr><td>'+ keyCell+'</td>';
+//    if (classValue == "COMPLEX") {
+//        data = valueValue.split("|", 3);
+//        key = data[0];
+//        value = data[1] +":" + data[2];
+//    } else {
+//        key = valueValue;
+//        value = valueValue;
+//    }
+//    //Generamos el contenido de la celda de la valor
+//    if (classKey == "COMPLEX" || classKey == "BASIC") {
+//        var valueCell = '<input type="hidden" name="'+popUpForMapProperty+'_value_'+count+'" value="'+key+'"/>'+value;;
+//    } else {
+//        valueCell = '<input type="file" name="'+popUpForMapProperty+'_value_'+count+ '" value="'+key+'"/>'
+//    }
+//    text += '<td>'+valueCell+'</td><td><input type="button" value="'+ deleteRowList + '" class="deleteRowMap"/></td></tr>';
+//    tbody.append(text);
+
+}
+
+function deleteRowMap(element) {
+    var tbody = element.parent().parent().parent();
+    var property = tbody.parent().attr("id");
+    var tr = element.parent().parent();
+    tr.remove();
+    var count = 0;
+    tbody.find("input[name^="+property+"_key_]").each(function(){
+        var name = $(this).attr("name");
+        var prevIndex = name.substr((property + "_key_").length);
+        var value = $("input[name="+property+"_value_"+prevIndex+"]");
+        $(this).attr("name",property+"_key_"+count);
+        value.attr("name",property+"_value_"+count);
+        count++;
+    })
 }
 
 //Variable que almacena la posición del scroll, por defecto tiene valor 0.

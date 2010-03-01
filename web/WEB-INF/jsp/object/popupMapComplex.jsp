@@ -2,6 +2,13 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <fmt:setBundle basename="es.uc3m.it.mapstore.web.internationalization.ViewInternationalization" var="lang"/>
 <div class="complex">
+    <fmt:message key="filterQuery" bundle="${lang}"/><br/>
+    <c:if test="${not empty type}">
+        _TYPE = <input type="text" name="type" value="<c:out value="${type}"/>" readonly="readonly"/> AND
+    </c:if>
+    <input type="text" name="query" value="<c:out value="${query}"/>">
+    <input type="button" class="searchMap" value="<fmt:message key="search" bundle="${lang}"/>"/>
+    <br/>
     <table>
         <thead>
             <tr>
@@ -23,7 +30,7 @@
                 <c:otherwise>
                     <c:forEach items="${items}" var="item">
                         <tr>
-                            <td><input type="radio" name="selected" value="${item.id}|${item.type}|${item.name}"</td>
+                            <td><input type="radio" name="selected${keyOrValue}" value="${item.id}|${item.type}|${item.name}"</td>
                             <td><c:out value="${item.id}"/></td>
                             <td><c:out value="${item.version}"/></td>
                             <td><fmt:formatDate value="${item.recordDate}" pattern="${datePattern}"/></td>

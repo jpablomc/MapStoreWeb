@@ -46,6 +46,8 @@ function changeDatatype() {
                                     text += '<input type="text" id="'+propertyName+'" name="'+propertyName+'" class="decimalInput"/>';
                             } else if (type == 'Date' ) {
                                     text += '<input type="text" id="'+propertyName+'" name="'+propertyName+'" class="dateInput"/>';
+                            } else if (type == 'File' ) {
+                                    text += '<input type="file" id="'+propertyName+'" name="'+propertyName+'" class="dateFile"/>';
                             } else if (type == 'List' ) {
                                 var subtype = $(this).attr('subtype');
                                 if (subtype == 'String') {
@@ -64,6 +66,11 @@ function changeDatatype() {
                                     text += '<div><table id="'+propertyName+'"><thead><tr><th>'+
                                         valueInternationalizedString+'</th><th></th></tr></thead><tbody></tbody></table><input type="button" value="'+
                                         addToListInternationalizedString+'" class="addToListDate"/></div>';
+                                } else if (subtype == 'File' ) {
+                                    text += '<div><table id="'+propertyName+'"><thead><tr><th>'+
+                                        valueInternationalizedString+'</th><th></th></tr></thead><tbody></tbody></table><input type="button" value="'+
+                                        addToListInternationalizedString+'" class="addToListFile"/></div>';
+
                                 } else {
                                     text += '<div><table id="'+propertyName+'"><thead><tr><th>'+
                                         valueInternationalizedString+'</th><th></th></tr></thead><tbody></tbody></table><input type="button" value="'+
@@ -86,7 +93,7 @@ function changeDatatype() {
                                     propertyName+'" id="'+propertyName+
                                     '" class="hiddenObject"/><input type="text" disabled="disabled" class="visibleObject"/>'+
                                     '<input type="button" value="'+
-                                    addToObjectInternationalizedString+
+                                    selecObjectInternationalizedString+
                                     '" class="addToObject"/><input type="button" value="'+
                                     clearObjectInternationalizedString+
                                     '" class="clearObject"/></div>';

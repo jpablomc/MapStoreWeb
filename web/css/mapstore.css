@@ -1,0 +1,77 @@
+/* 
+    Document   : mapstore
+    Author     : Pablo
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+table
+{
+width:40%;
+border-collapse:collapse;
+}
+
+td, th
+{
+border:1px solid #98bf21;
+padding:3px 7px 2px 7px;
+height: 32px;
+}
+th
+{
+text-align:left;
+padding-top:5px;
+padding-bottom:4px;
+background-color:#A7C942;
+color:#ffffff;
+}
+tr.alt td
+{
+color:#000000;
+background-color:#EAF2D3;
+}
+
+input.upRow {
+    width: 32px;
+    height: 21px;
+    padding: 0 0 0;
+    margin: 0;
+    border: 0;
+    background: transparent url(../images/up_arrow.png) no-repeat;
+    text-indent: -1000em;
+    overflow: hidden;
+    cursor: pointer; /* hand-shaped cursor */
+    cursor: hand; /* for IE 5.x */
+}
+
+input.downRow {
+    width: 32px;
+    height: 21px;
+    padding: 0 0 0;
+    margin: 0;
+    border: 0;
+    background: transparent url(../images/down_arrow.png) no-repeat;
+    text-indent: -1000em;
+    overflow: hidden;
+    cursor: pointer; /* hand-shaped cursor */
+    cursor: hand; /* for IE 5.x */
+}
+
+input.deleteRow {
+    width: 32px;
+    height: 32px;
+    padding: 0 0 0;
+    margin: 0;
+    border: 0;
+    background: transparent url(../images/delete.png) no-repeat;
+    text-indent: -1000em;
+    overflow: hidden;
+    cursor: pointer; /* hand-shaped cursor */
+    cursor: hand; /* for IE 5.x */
+}
+
+

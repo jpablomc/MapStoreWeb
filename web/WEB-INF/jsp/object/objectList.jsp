@@ -21,7 +21,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title><fmt:message key="object.search.title" bundle="${lang}"/></title>
-        <link rel="stylesheet" type="text/css" href="<c:url value="/style.css"/>"/>
+        <link rel="stylesheet" href="<c:url value="/css/mapstore.css"/>" media="all" />
         <script type="text/javascript">
             function error() {
                 var text = '<c:out value="${error}"/>';

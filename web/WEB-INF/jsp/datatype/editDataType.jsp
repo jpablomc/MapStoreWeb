@@ -26,6 +26,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="<c:url value="/css/mapstore.css"/>" media="all" />
         <title><c:out value="${title}"/></title>
 
         <script type="text/javascript">
@@ -207,7 +208,8 @@
                                             </c:forEach>
                                             <c:choose>
                                                 <c:when test="${isList}">
-                                                    <c:set var="listType" value="${dt.extraData[constant.LIST_PREFIX + prop.key]}"/>
+                                                    <c:set var="aux" value="${constant.LIST_PREFIX}${prop.key}"/>
+                                                    <c:set var="listType" value="${extraData[aux]}"/>
                                                     <label for="propertyListType<c:out value='${status.count}'/>"><fmt:message key="datatypes.edit.listTypeLabel" bundle="${lang}"/></label>
                                                     <select name="propertyListType<c:out value='${status.count}'/>" id="propertyListType<c:out value='${status.count}'/>">
                                                         <option value="" ><fmt:message key="datatypes.edit.undetermined" bundle="${lang}"/></option>
@@ -225,8 +227,10 @@
                                                     </select>
                                                 </c:when>
                                                 <c:when test="${isMap}">
-                                                    <c:set var="mapKeyType" value="${dt.extraData[constant.MAP_KEY__PREFIX + prop.key]}"/>
-                                                    <c:set var="mapValueType" value="${dt.extraData[constant.MAP_VALUE_PREFIX + prop.key]}"/>
+                                                    <c:set var="aux" value="${constant.MAP_KEY__PREFIX}${prop.key}"/>
+                                                    <c:set var="mapKeyType" value="${extraData[aux]}"/>
+                                                    <c:set var="aux" value="${constant.MAP_VALUE_PREFIX}${prop.key}"/>
+                                                    <c:set var="mapValueType" value="${extraData[aux]}"/>
                                                     <label for="propertyMapKeyType<c:out value='${status.count}'/>"><fmt:message key="datatypes.edit.mapKeyLabel" bundle="${lang}"/></label>
                                                     <select name="propertyMapKeyType<c:out value='${status.count}'/>" id="propertyMapKeyType<c:out value='${status.count}'/>">
                                                         <option value="" ><fmt:message key="datatypes.edit.undetermined" bundle="${lang}"/></option>

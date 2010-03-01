@@ -12,8 +12,8 @@
         <c:when test="${type eq 'Float' || type eq 'Double'}">
             <input type="text" value="" name="basic" class="basicDecimal"/>
         </c:when>
-        <c:when test="${type eq 'Date'}">
+        <c:otherwise>
             <input type="text" value="" name="basic" class="basicDate"/>
-        </c:when>
+        </c:otherwise>
     </c:choose>   
 </div>

@@ -12,6 +12,7 @@ import es.uc3m.it.mapstore.web.util.JSTLConstants;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,10 @@ public class DataTypeController {
     public ModelAndView listAllDatatypes() {
         ModelAndView mav = new ModelAndView("datatype/listDatatypes");
         List<DataType> datatypes = service.getAll();
+        for (Iterator<DataType> it = datatypes.iterator();it.hasNext();) {
+            DataType dt = it.next();
+            if (DataTypeConstant.BASICTYPES.contains(dt.getName())) it.remove();
+        }
         Collections.sort(datatypes, new DatatypesSorter());
         mav.addObject("datatypes", datatypes);
         return mav;
@@ -63,6 +68,7 @@ public class DataTypeController {
         DataType dt = service.getDataType(req.getParameter("id"));
         mav.addObject("name", dt.getName());
         mav.addObject("properties", dt.getAttributes());
+        mav.addObject("extraData", dt.getExtraData());
         mav.addObject("pk", dt.getPk());
         mav.addObject("edit", true);
         return mav;
@@ -80,7 +86,9 @@ public class DataTypeController {
             DataType dt = validateFormWithErrors(req.getParameterMap());
             mav.addObject("name", dt.getName());
             mav.addObject("properties", dt.getAttributes());
+            mav.addObject("extraData", dt.getExtraData());
             mav.addObject("edit", true);
+            mav.addObject("pk", dt.getPk());
             mav.addObject("error",error);
         }
         if (mav == null) mav = new ModelAndView(new RedirectView("/datatype/list.html",true));
@@ -98,6 +106,8 @@ public class DataTypeController {
             DataType dt = validateFormWithErrors(req.getParameterMap());
             mav.addObject("name", dt.getName());
             mav.addObject("properties", dt.getAttributes());
+            mav.addObject("extraData", dt.getExtraData());
+            mav.addObject("pk", dt.getPk());
             mav.addObject("error",error);
         }
         if (mav == null) mav = new ModelAndView(new RedirectView("/datatype/list.html",true));
@@ -177,12 +187,14 @@ public class DataTypeController {
         }
         String name = ((String[])parameterMap.get("name"))[0];
         Map<String,DataType> atrib = new HashMap<String, DataType>();
-        if (parameterMap.get("pk") == null) throw new IllegalArgumentException("Primary key has not been defined");
-        String pk = ((String[])parameterMap.get("pk"))[0];
-        String pkValue = ((String[])parameterMap.get(pk))[0];
-        String pkPropType = pk.replaceAll("propertyName", "propertyType");
-        DataType pkDT = atrib.get(pkPropType);
-        if (!pkDT.getName().equals(DataTypeConstant.STRINGTYPE)) throw new IllegalArgumentException("Primary key must be a String property");
+        String pk = null;
+        String pkValue = null;
+        String pkPropType = null;
+        DataType pkDT = null;
+        if (parameterMap.get("pk") != null) pk = ((String[])parameterMap.get("pk"))[0];
+        if (parameterMap.get(pk) != null) pkValue = ((String[])parameterMap.get(pk))[0];
+        if (pk != null) pkPropType = pk.replaceAll("propertyName", "propertyType");
+        if (parameterMap.get(pkPropType) != null)pkDT = aux.get(((String[])parameterMap.get(pkPropType))[0]);
         DataType toReturn = new DataType(name);
         toReturn.setPk(pkValue);
         int indexExtra = 0;
@@ -199,7 +211,7 @@ public class DataTypeController {
                     String propMapKey = propName.replaceAll("propertyName", "propertyListType");
                     String key = ((String[])parameterMap.get(propMapKey))[0];
                     DataType dtSubtype = aux.get(key);
-                    toReturn.setMapKeyDataType(nombreAtributo, dtSubtype);
+                    toReturn.setListDataType(nombreAtributo, dtSubtype);
                     indexExtra++;
                 } else if  (DataTypeConstant.MAPTYPES.contains(dtProperty.getName())) {
                     String propMapKey = propName.replaceAll("propertyName", "propertyMapKeyType");
@@ -215,7 +227,6 @@ public class DataTypeController {
                 }
             }
         }
-        if (atrib.size()*2+indexExtra+2 != parameterMap.size()) throw new IllegalArgumentException("Not all the parameters can be processed");
         toReturn.setAttributes(atrib);
         return toReturn;
     }

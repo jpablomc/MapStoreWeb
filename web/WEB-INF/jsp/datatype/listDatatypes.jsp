@@ -14,6 +14,7 @@
     <head>        
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title><fmt:message key="datatypes.list.title" bundle="${lang}"/></title>
+        <link rel="stylesheet" href="<c:url value="/css/mapstore.css"/>" media="all" />
     </head>
     <body>
         <div>
